@@ -12,6 +12,7 @@ class ApiBloc extends Bloc<ApiEvent, ApiState> {
   @override
   Stream<ApiState> mapEventToState(ApiEvent event) async* {
     if (event is RequestSummaryEvent) {
+      yield LoadingState();
       SummaryModel summary = await _repository.getSummary();
       yield summary != null ? HasDataState(summary) : ErrorState();
     } else {

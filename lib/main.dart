@@ -3,6 +3,7 @@ import 'dart:io' show Platform, exit;
 import 'package:covi_19/api/blocs/api-event.dart';
 import 'package:covi_19/api/blocs/api-state.dart';
 import 'package:covi_19/api/blocs/api.bloc.dart';
+import 'package:covi_19/api/models/summary-country.model.dart';
 import 'package:covi_19/api/models/summary-global.model.dart';
 import 'package:covi_19/utils/constants/colors.const.dart';
 import 'package:flutter/material.dart';
@@ -39,7 +40,7 @@ class App extends StatelessWidget {
       home: BlocBuilder<ApiBloc, ApiState>(
         builder: (context, state) {
           if (state is HasDataState) {
-            return MainScreen(state.data.global);
+            return MainScreen(state.data.global, state.data.countries);
           } else if (state is LoadingState) {
             return LoadingScreen();
           } else {
@@ -135,8 +136,9 @@ class LoadingScreen extends StatelessWidget {
 
 class MainScreen extends StatelessWidget {
   final SummaryGlobalModel _global;
+  final List<SummaryCountryModel> _countries;
 
-  MainScreen(this._global);
+  MainScreen(this._global, this._countries);
 
   @override
   Widget build(BuildContext context) {
@@ -148,73 +150,120 @@ class MainScreen extends StatelessWidget {
       body: SafeArea(
         minimum: const EdgeInsets.all(16.0),
         child: ListView(
+          children: _generateListView(),
+        ),
+      ),
+    );
+  }
+
+  List<Widget> _generateListView() {
+    List<Widget> headerList = [
+      Card(
+        color: COLOR_ACCENT,
+        child: ListTile(
+          trailing: Icon(
+            Icons.chevron_right,
+            color: COLOR_PRIMARY,
+          ),
+          title: Text(
+            'General info',
+            style: TextStyle(
+              color: COLOR_PRIMARY,
+            ),
+          ),
+          subtitle: Text(
+            'Info about the app, health guidances',
+            style: TextStyle(
+              color: COLOR_PRIMARY,
+            ),
+          ),
+        ),
+      ),
+      SizedBox(
+        height: 16.0,
+      ),
+      Card(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Card(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  ListTile(
-                    leading: Icon(
-                      Icons.language,
-                      size: 32.0,
-                    ),
-                    title: Text('Global stats'),
-                    subtitle: Text('Data provided by COVID19 API'),
-                  ),
-                  Divider(),
-                  ListTile(
-                    title: Text('Confirmed cases'),
-                    subtitle: Text(
-                      'Newly confirmed: ${_global.newConfirmed}\nTotal confirmed: ${_global.totalConfirmed}',
-                    ),
-                  ),
-                  ListTile(
-                    title: Text('Deaths data'),
-                    subtitle: Text(
-                      'New deaths: ${_global.newDeaths}\nAll deaths: ${_global.totalDeaths}',
-                    ),
-                  ),
-                  ListTile(
-                    title: Text('Recovered data'),
-                    subtitle: Text(
-                      'Newly recovered: ${_global.newRecovered}\nAll recovered: ${_global.totalRecovered}',
-                    ),
-                  ),
-                  SizedBox(
-                    height: 8.0,
-                  ),
-                ],
+            ListTile(
+              leading: Icon(
+                Icons.language,
+                size: 32.0,
+              ),
+              title: Text('Global stats'),
+              subtitle: Text('Data provided by COVID19 API'),
+            ),
+            Divider(),
+            ListTile(
+              title: Text('Confirmed cases'),
+              subtitle: Text(
+                'Newly confirmed: ${_global.newConfirmed}\nTotal confirmed: ${_global.totalConfirmed}',
+              ),
+            ),
+            ListTile(
+              title: Text('Deaths data'),
+              subtitle: Text(
+                'New deaths: ${_global.newDeaths}\nAll deaths: ${_global.totalDeaths}',
+              ),
+            ),
+            ListTile(
+              title: Text('Recovered data'),
+              subtitle: Text(
+                'Newly recovered: ${_global.newRecovered}\nAll recovered: ${_global.totalRecovered}',
               ),
             ),
             SizedBox(
-              height: 16.0,
-            ),
-            Card(
-              child: ListTile(
-                trailing: Icon(
-                  Icons.chevron_right,
-                ),
-                title: Text('Data by country'),
-                subtitle: Text('Showing live data for every country'),
-              ),
-            ),
-            SizedBox(
-              height: 16.0,
-            ),
-            Card(
-              child: ListTile(
-                trailing: Icon(
-                  Icons.chevron_right,
-                ),
-                title: Text('General info'),
-                subtitle: Text(
-                  'Info about the app, health guidances',
-                ),
-              ),
+              height: 8.0,
             ),
           ],
         ),
       ),
+      Divider(),
+    ];
+    headerList.addAll(_generatePerCountryReport());
+    return headerList;
+  }
+
+  List<Card> _generatePerCountryReport() {
+    return List.generate(
+      _countries.length,
+      (index) {
+        return Card(
+          child: Column(
+            children: [
+              ListTile(
+                title: Text(
+                  '${_countries[index].country} (${_countries[index].countryCode})',
+                ),
+                subtitle: Text('Data from ${_countries[index].date}'),
+              ),
+              Divider(),
+              ListTile(
+                title: Text('Confirmed cases'),
+                subtitle: Text(
+                  'Newly confirmed: ${_countries[index].newConfirmed}\nTotal confirmed: ${_countries[index].totalConfirmed}',
+                ),
+              ),
+              ListTile(
+                title: Text('Deaths data'),
+                subtitle: Text(
+                  'New deaths: ${_countries[index].newDeaths}\nAll deaths: ${_countries[index].totalDeaths}',
+                ),
+              ),
+              ListTile(
+                title: Text('Recovered data'),
+                subtitle: Text(
+                  'Newly recovered: ${_countries[index].newRecovered}\nAll recovered: ${_countries[index].totalRecovered}',
+                ),
+              ),
+              SizedBox(
+                height: 8.0,
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }
