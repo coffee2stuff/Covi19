@@ -21,6 +21,9 @@ class App extends StatelessWidget {
         primaryColor: COLOR_PRIMARY,
         accentColor: COLOR_ACCENT,
         scaffoldBackgroundColor: COLOR_PRIMARY,
+        appBarTheme: AppBarTheme(
+          elevation: 0.0,
+        ),
       ),
       home: MainScreen(),
     );
@@ -33,14 +36,13 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  SummaryGlobalModel _global = SummaryGlobalModel.from(
-    100282,
-    1162857,
-    5658,
-    63263,
-    15405,
-    230845,
-  );
+  SummaryGlobalModel _global = SummaryGlobalModel();
+
+  @override
+  void initState() {
+    super.initState();
+    _refreshData();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,149 +53,79 @@ class _MainScreenState extends State<MainScreen> {
       ),
       body: SafeArea(
         minimum: const EdgeInsets.all(16.0),
-        child: ListView(
-          children: [
-            ListTile(
-              title: Text('Global stats'),
-              subtitle: Text('Data by Coronavirus COVID19 API'),
-            ),
-            Card(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 0.0),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        RichText(
-                          text: TextSpan(
-                            text: 'Confirmed cases\n',
-                            style: _cardStyle(true),
-                            children: [
-                              TextSpan(
-                                text: 'Newly confirmed: ',
-                                style: _cardStyle(
-                                  false,
-                                ),
-                              ),
-                              TextSpan(
-                                text: '${_global.newConfirmed}\n',
-                                style: _cardStyle(
-                                  false,
-                                  fontColor: COLOR_TEXT_SECONDARY,
-                                ),
-                              ),
-                              TextSpan(
-                                text: 'Total confirmed: ',
-                                style: _cardStyle(
-                                  false,
-                                ),
-                              ),
-                              TextSpan(
-                                text: '${_global.totalConfirmed}\n\n',
-                                style: _cardStyle(
-                                  false,
-                                  fontColor: COLOR_TEXT_SECONDARY,
-                                ),
-                              ),
-                              TextSpan(
-                                text: 'Deaths data\n',
-                                style: _cardStyle(true),
-                                children: [
-                                  TextSpan(
-                                    text: 'New deaths: ',
-                                    style: _cardStyle(
-                                      false,
-                                    ),
-                                  ),
-                                  TextSpan(
-                                    text: '${_global.newDeaths}\n',
-                                    style: _cardStyle(
-                                      false,
-                                      fontColor: COLOR_TEXT_SECONDARY,
-                                    ),
-                                  ),
-                                  TextSpan(
-                                    text: 'All deaths: ',
-                                    style: _cardStyle(
-                                      false,
-                                    ),
-                                  ),
-                                  TextSpan(
-                                    text: '${_global.totalDeaths}\n\n',
-                                    style: _cardStyle(
-                                      false,
-                                      fontColor: COLOR_TEXT_SECONDARY,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              TextSpan(
-                                text: 'Recovered data\n',
-                                style: _cardStyle(true),
-                                children: [
-                                  TextSpan(
-                                    text: 'Newly recovered: ',
-                                    style: _cardStyle(
-                                      false,
-                                    ),
-                                  ),
-                                  TextSpan(
-                                    text: '${_global.newRecovered}\n',
-                                    style: _cardStyle(
-                                      false,
-                                      fontColor: COLOR_TEXT_SECONDARY,
-                                    ),
-                                  ),
-                                  TextSpan(
-                                    text: 'All recovered: ',
-                                    style: _cardStyle(
-                                      false,
-                                    ),
-                                  ),
-                                  TextSpan(
-                                    text: '${_global.newRecovered}',
-                                    style: _cardStyle(
-                                      false,
-                                      fontColor: COLOR_TEXT_SECONDARY,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
+        child: RefreshIndicator(
+          onRefresh: _refreshData,
+          child: ListView(
+            children: [
+              Card(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    ListTile(
+                      leading: Icon(
+                        Icons.language,
+                        size: 32.0,
+                      ),
+                      title: Text('Global stats'),
+                      subtitle: Text('Data provided by COVID19 API'),
                     ),
-                  ),
-                  ButtonBar(
-                    children: [
-                      FlatButton(
-                        child: const Text('More info'),
-                        onPressed: () {},
-                      )
-                    ],
-                  ),
-                ],
+                    Divider(),
+                    ListTile(
+                      title: Text('Confirmed cases'),
+                      subtitle: Text(
+                        'Newly confirmed: ${_global.newConfirmed}\nTotal confirmed: ${_global.totalConfirmed}',
+                      ),
+                    ),
+                    ListTile(
+                      title: Text('Deaths data'),
+                      subtitle: Text(
+                        'New deaths: ${_global.newDeaths}\nAll deaths: ${_global.totalDeaths}',
+                      ),
+                    ),
+                    ListTile(
+                      title: Text('Recovered data'),
+                      subtitle: Text(
+                        'Newly recovered: ${_global.newRecovered}\nAll recovered: ${_global.totalRecovered}',
+                      ),
+                    ),
+                    SizedBox(
+                      height: 8.0,
+                    ),
+                  ],
+                ),
               ),
-            ),
-            ListTile(
-              title: Text('Data by country'),
-              subtitle: Text('Showing summary data for every country'),
-            ),
-          ],
+              SizedBox(
+                height: 16.0,
+              ),
+              Card(
+                child: ListTile(
+                  trailing: Icon(
+                    Icons.chevron_right,
+                  ),
+                  title: Text('Data by country'),
+                  subtitle: Text('Showing live data for every country'),
+                ),
+              ),
+              SizedBox(
+                height: 16.0,
+              ),
+              Card(
+                child: ListTile(
+                  trailing: Icon(
+                    Icons.chevron_right,
+                  ),
+                  title: Text('General info'),
+                  subtitle: Text(
+                    'Info about the app, health guidances',
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  TextStyle _cardStyle(bool isBold, {Color fontColor = COLOR_TEXT_PRIMARY}) {
-    return TextStyle(
-      color: fontColor,
-      fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
-      fontSize: isBold ? 16.0 : 14.0,
-    );
-  }
+  Future<void> _refreshData() async {}
 }
