@@ -158,23 +158,28 @@ class MainScreen extends StatelessWidget {
 
   List<Widget> _generateListView() {
     List<Widget> headerList = [
-      Card(
-        color: COLOR_ACCENT,
-        child: ListTile(
-          trailing: Icon(
-            Icons.chevron_right,
-            color: COLOR_PRIMARY,
-          ),
-          title: Text(
-            'General info',
-            style: TextStyle(
+      GestureDetector(
+        onTap: () {
+          //Navigator.push(context, route);
+        },
+        child: Card(
+          color: COLOR_ACCENT,
+          child: ListTile(
+            trailing: Icon(
+              Icons.chevron_right,
               color: COLOR_PRIMARY,
             ),
-          ),
-          subtitle: Text(
-            'Info about the app, health guidances',
-            style: TextStyle(
-              color: COLOR_PRIMARY,
+            title: Text(
+              'General info',
+              style: TextStyle(
+                color: COLOR_PRIMARY,
+              ),
+            ),
+            subtitle: Text(
+              'Info about the app, health guidances',
+              style: TextStyle(
+                color: COLOR_PRIMARY,
+              ),
             ),
           ),
         ),
@@ -264,6 +269,17 @@ class MainScreen extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+class GeneralInfoScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('General info'),
+      ),
     );
   }
 }
