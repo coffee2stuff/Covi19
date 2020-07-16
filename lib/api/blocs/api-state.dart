@@ -1,3 +1,5 @@
+import 'package:covi_19/api/models/summary.model.dart';
+
 abstract class ApiState {
   const ApiState();
 }
@@ -5,10 +7,8 @@ abstract class ApiState {
 class LoadingState extends ApiState {}
 
 class HasDataState extends ApiState {
-  final dynamic data;
+  final SummaryModel data;
   HasDataState(this.data);
 }
-
-class NoDataState extends ApiState {}
 
 class ErrorState extends ApiState {}
