@@ -9,6 +9,7 @@ import 'package:covi_19/utils/constants/colors.const.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 void main() {
   runApp(
@@ -159,8 +160,11 @@ class MainScreen extends StatelessWidget {
   List<Widget> _generateListView() {
     List<Widget> headerList = [
       GestureDetector(
-        onTap: () {
-          //Navigator.push(context, route);
+        onTap: () async {
+          String url = 'https://gitlab.com/coffee2stuff/covi19';
+          if (await canLaunch(url)) {
+            await launch(url);
+          }
         },
         child: Card(
           color: COLOR_ACCENT,
@@ -269,17 +273,6 @@ class MainScreen extends StatelessWidget {
           ),
         );
       },
-    );
-  }
-}
-
-class GeneralInfoScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('General info'),
-      ),
     );
   }
 }
